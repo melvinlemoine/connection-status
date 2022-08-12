@@ -1,0 +1,97 @@
+@font-face {
+  font-family: Fira;
+  src: url("../fonts/FiraCode-Regular.woff2");
+}
+
+@font-face {
+  font-family: SmoothFantasy;
+  src: url("../fonts/SmoothFantasy.ttf");
+}
+
+@font-face {
+  font-family: Fresh;
+  src: url("../fonts/Fresh.ttf");
+}
+
+@font-face {
+  font-family: Poppins;
+  src: url("../fonts/poppins/Poppins-Light.ttf");
+  font-weight: lighter;
+}
+
+@font-face {
+  font-family: Poppins;
+  src: url("../fonts/poppins/Poppins-Regular.ttf");
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: Poppins;
+  src: url("../fonts/poppins/Poppins-Bold.ttf");
+  font-weight: 700;
+}
+
+.home {
+  background: #dfdfdf;
+}
+
+.home .header {
+  background: linear-gradient(90deg, navy, #1084d0);
+}
+
+.home .header__title--title {
+  font-family: fresh;
+  font-size: 5rem;
+  color: white;
+  text-shadow: 5px 5px 0 rgba(255, 255, 255, 0.25);
+}
+
+.home .header__title--span {
+  position: absolute;
+  bottom: -10%;
+  right: 0;
+  color: white;
+  font-family: SmoothFantasy;
+  font-size: 1rem;
+  text-shadow: 0 0 10px #1084d0;
+}
+
+.home .informations {
+  font-family: Fira;
+}
+
+.home .informations__status {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+}
+
+.home .informations__status_connection {
+  color: white;
+  padding: .5rem .75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  font-family: fira;
+}
+
+.home .informations__status_connection.online {
+  background-color: green;
+}
+
+.home .informations__status_connection.offline {
+  background-color: red;
+}
+
+.home .charts {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  margin-top: 3rem;
+  padding: 0 2rem;
+}
+
+.home .charts__chart {
+  width: 100%;
+}
+
+/*# sourceMappingURL=styles.css.map */
