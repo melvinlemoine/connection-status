@@ -19,6 +19,7 @@
     <h1>downlink : <span id="downlink">waiting...</span></h1>
     <h1>RTT : <span id="rtt">waiting...</span></h1>
     <h1>Last change : <span id="lastUpdate"></span></h1>
+    <h1>IP : <span id="ip">Waiting...</span></h1>
 
     <div style="height: 20rem">
       <canvas id="myChart"></canvas>
@@ -92,7 +93,7 @@
     function updateChart(date, downlink, rtt) {
       //   console.log("📊 Update chart");
 
-      if(myChart.data.datasets[0].data > 10){
+      if (myChart.data.datasets[0].data > 10) {
         myChart.data.datasets[0].data.shift();
         console.log("Removed first element of array");
       }
@@ -118,34 +119,41 @@
         // console.log("red");
       }
 
-    //   myChart.data.datasets[1].data.push(rtt);
+      //   myChart.data.datasets[1].data.push(rtt);
 
-    //   if (rtt > 1000) {
-    //     myChart.data.datasets[1].backgroundColor.push(red);
-    //     myChart.data.datasets[1].borderColor.push(redBorder);
-    //   } else if (rtt > 500) {
-    //     myChart.data.datasets[1].backgroundColor.push(orange);
-    //     myChart.data.datasets[1].borderColor.push(orangeBorder);
-    //   } else if (rtt > 250) {
-    //     myChart.data.datasets[1].backgroundColor.push(yellow);
-    //     myChart.data.datasets[1].borderColor.push(yellowBorder);
-    //   } else {
-    //     myChart.data.datasets[1].backgroundColor.push(green);
-    //     myChart.data.datasets[1].borderColor.push(greenBorder);
-    //   }
+      //   if (rtt > 1000) {
+      //     myChart.data.datasets[1].backgroundColor.push(red);
+      //     myChart.data.datasets[1].borderColor.push(redBorder);
+      //   } else if (rtt > 500) {
+      //     myChart.data.datasets[1].backgroundColor.push(orange);
+      //     myChart.data.datasets[1].borderColor.push(orangeBorder);
+      //   } else if (rtt > 250) {
+      //     myChart.data.datasets[1].backgroundColor.push(yellow);
+      //     myChart.data.datasets[1].borderColor.push(yellowBorder);
+      //   } else {
+      //     myChart.data.datasets[1].backgroundColor.push(green);
+      //     myChart.data.datasets[1].borderColor.push(greenBorder);
+      //   }
 
       myChart.update();
     }
   </script>
 
   <script>
-    function getIPFromAmazon() {
-      fetch("https://checkip.amazonaws.com/")
-        .then((res) => res.text())
-        .then((data) => console.log(data));
-    }
+    // function getIPFromAmazon() {
+    //   fetch("https://checkip.amazonaws.com/")
+    //     .then((res) => res.text())
+    //     .then((data) => console.log(data));
+    // }
 
-    getIPFromAmazon();
+    // getIPFromAmazon();
+
+    fetch("https://api.ipify.org/")
+      .then((r) => r.text())
+      .then((r) => {
+        const IP = r;
+        document.getElementById("ip").innerText = IP;
+      });
 
     function updateInformations() {
       console.log("🔄 Informations changed");
