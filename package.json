@@ -1,0 +1,21 @@
+{
+  "name": "integration-boilerplate",
+  "version": "1.0.1",
+  "scripts": {
+    "deploy": "npm run build-clean && npm run build-sass && npm run build-autoprefix && npm run build-cleancss && npm compress images",
+    "build-autoprefix": "postcss --use autoprefixer --map false --output assets/css/styles.css assets/css/styles.css",
+    "build-cleancss": "cleancss -o assets/css/styles.css assets/css/styles.css",
+    "build-clean": "rimraf css",
+    "build-sass": "node-sass --output-style expanded --source-map true sass/styles.sass assets/css/styles.css",
+    "watch": "npm run build-sass -- --watch"
+  },
+  "author": "https://github.com/melvinlemoine",
+  "devDependencies": {
+    "autoprefixer": "^10.4.1",
+    "clean-css-cli": "^5.5.0",
+    "node-sass": "^7.0.1",
+    "postcss-cli": "^9.1.0",
+    "rimraf": "^3.0.2"
+  },
+  "description": ""
+}
