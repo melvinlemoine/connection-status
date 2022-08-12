@@ -1,0 +1,19 @@
+.informations
+    font-family: Fira
+
+    &__status
+        display: grid
+        grid-template-columns: repeat(2, 1fr)
+        gap: 2rem
+
+        &_connection
+            color: white
+            padding: .5rem .75rem
+            font-weight: 900
+            text-transform: uppercase
+            font-family: fira
+            &.online
+                background-color: green
+            &.offline
+                background-color: red
+        &_ip

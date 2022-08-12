@@ -8,20 +8,11 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- <link rel="stylesheet" href="assets/css/reset.css" /> -->
-  <!-- <link rel="stylesheet" href="assets/css/styles.css" /> -->
+  <link rel="stylesheet" href="assets/css/amethyst.min.css" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
 
-<body>
-  <h1 id="status">waiting...</h1>
-  <h1>Type : <span id="type">waiting...</span></h1>
-  <h1>Effective type : <span id="effectiveType">waiting...</span></h1>
-  <h1>downlinkMax : <span id="downlinkMax">waiting...</span></h1>
-  <h1>downlink : <span id="downlink">waiting...</span></h1>
-  <h1>RTT : <span id="rtt">waiting...</span></h1>
-  <h1>Last change : <span id="lastUpdate"></span></h1>
-
-  <?php
+<?php
 function getUserIpAddr()
 {
   if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
@@ -36,11 +27,48 @@ function getUserIpAddr()
   return $ip;
 };
 ?>
-  <h1>IP : <span id="ip"><?php echo getUserIpAddr(); ?></span></h1>
 
-  <div style="height: 20rem">
-    <canvas id="myChart"></canvas>
+<body class="body home">
+  <header class="header pv-3">
+    <div class="container flex-c h-centered">
+      <h1 class="header__title relative"><span class="header__title--title bold uppercase">Connection Status</span><span class="header__title--span">Retro Edition</span></h1>
+    </div>
+  </header>
+
+  <!-- <hr class="separator mv-5"> -->
+
+  <div class="informations">
+
+    <div class="container mt-5">
+      <div class="informations__status">
+        <div class="informations__status_connection offline" id="status">waiting...</div>
+        <div>IP : <span id="ip"><?php echo getUserIpAddr(); ?></span></div>
+      </div>
+
+      <h1>Type : <span id="type">waiting...</span></h1>
+      <h1>Effective type : <span id="effectiveType">waiting...</span></h1>
+      <h1>downlinkMax : <span id="downlinkMax">waiting...</span></h1>
+      <h1>downlink : <span id="downlink">waiting...</span></h1>
+      <h1>RTT : <span id="rtt">waiting...</span></h1>
+      <h1>Last change : <span id="lastUpdate"></span></h1>
+      
+    </div>
+
   </div>
+
+
+
+  <div class="charts flex-r">
+
+
+    <div class="charts__chart" style="height: 20rem">
+      <canvas id="chart-bandwidth"></canvas>
+    </div>
+    <div class="charts__chart" style="height: 20rem">
+      <canvas id="chart-rtt"></canvas>
+    </div>
+  </div>
+
 </body>
 
 <script src="assets/js/moment.min.js"></script>
@@ -52,33 +80,37 @@ function getUserIpAddr()
 <!-- <script src="assets/js/chartjs-plugin-datalabels.min.js"></script> -->
 
 <script>
-  let data = {
+  let data_bandwidth = {
     labels: [],
     datasets: [{
-        label: "Connection speed in mb/s",
-        data: [],
-        backgroundColor: [],
-        borderColor: [],
-        borderWidth: 1,
-      },
-      // {
-      //   label: "RTT",
-      //   data: [],
-      //   backgroundColor: [],
-      //   borderColor: [],
-      //   borderWidth: 1,
-      // },
-    ],
+      label: "Connection speed in mb/s",
+      data: [],
+      backgroundColor: [],
+      borderColor: [],
+      borderWidth: 1,
+    }, ],
   };
 
-  const config = {
+  let data_rtt = {
+    labels: [],
+    datasets: [{
+      label: "RTT",
+      data: [],
+      backgroundColor: [],
+      borderColor: [],
+      borderWidth: 1,
+    }, ],
+  };
+
+  const config_bandwidth = {
     type: "bar",
-    data: data,
+    data: data_bandwidth,
 
     options: {
       locale: "fr",
       responsive: true,
       maintainAspectRatio: false,
+      fill: true,
       plugins: {
         legend: {
           display: false,
@@ -92,7 +124,30 @@ function getUserIpAddr()
     },
   };
 
-  const myChart = new Chart(document.getElementById("myChart"), config);
+  const config_rtt = {
+    type: "bar",
+    data: data_rtt,
+
+    options: {
+      locale: "fr",
+      responsive: true,
+      maintainAspectRatio: false,
+      fill: true,
+      plugins: {
+        legend: {
+          display: false,
+          position: "top",
+        },
+        title: {
+          display: true,
+          text: "RTT in ms",
+        },
+      },
+    },
+  };
+
+  const chart_bandwidth = new Chart(document.getElementById("chart-bandwidth"), config_bandwidth);
+  const chart_rtt = new Chart(document.getElementById("chart-rtt"), config_rtt);
 
   const red = "rgba(255, 99, 132, 0.2)";
   const redBorder = "rgb(255, 99, 132)";
@@ -109,83 +164,72 @@ function getUserIpAddr()
   function updateChart(date, downlink, rtt) {
     //   console.log("📊 Update chart");
 
-    if (myChart.data.datasets[0].data > 10) {
-      myChart.data.datasets[0].data.shift();
+    if (chart_bandwidth.data.datasets[0].data > 10) {
+      chart_bandwidth.data.datasets[0].data.shift();
+      chart_rtt.data.datasets[0].data.shift();
       console.log("Removed first element of array");
     }
 
-    myChart.data.labels.push(date);
-    myChart.data.datasets[0].data.push(downlink);
+    chart_bandwidth.data.labels.push(date);
+    chart_rtt.data.labels.push(date);
+
+    chart_bandwidth.data.datasets[0].data.push(downlink);
+    chart_rtt.data.datasets[0].data.push(rtt);
 
     if (downlink > 5) {
-      myChart.data.datasets[0].backgroundColor.push(green);
-      myChart.data.datasets[0].borderColor.push(greenBorder);
+      chart_bandwidth.data.datasets[0].backgroundColor.push(green);
+      chart_bandwidth.data.datasets[0].borderColor.push(greenBorder);
       // console.log("green");
     } else if (downlink > 2.5) {
-      myChart.data.datasets[0].backgroundColor.push(orange);
-      myChart.data.datasets[0].borderColor.push(orangeBorder);
+      chart_bandwidth.data.datasets[0].backgroundColor.push(orange);
+      chart_bandwidth.data.datasets[0].borderColor.push(orangeBorder);
       // console.log("orange");
     } else if (downlink > 1) {
-      myChart.data.datasets[0].backgroundColor.push(yellow);
-      myChart.data.datasets[0].borderColor.push(yellowBorder);
+      chart_bandwidth.data.datasets[0].backgroundColor.push(yellow);
+      chart_bandwidth.data.datasets[0].borderColor.push(yellowBorder);
       // console.log("yellow");
     } else {
-      myChart.data.datasets[0].backgroundColor.push(red);
-      myChart.data.datasets[0].borderColor.push(redBorder);
+      chart_bandwidth.data.datasets[0].backgroundColor.push(red);
+      chart_bandwidth.data.datasets[0].borderColor.push(redBorder);
       // console.log("red");
     }
 
     //   myChart.data.datasets[1].data.push(rtt);
 
-    //   if (rtt > 1000) {
-    //     myChart.data.datasets[1].backgroundColor.push(red);
-    //     myChart.data.datasets[1].borderColor.push(redBorder);
-    //   } else if (rtt > 500) {
-    //     myChart.data.datasets[1].backgroundColor.push(orange);
-    //     myChart.data.datasets[1].borderColor.push(orangeBorder);
-    //   } else if (rtt > 250) {
-    //     myChart.data.datasets[1].backgroundColor.push(yellow);
-    //     myChart.data.datasets[1].borderColor.push(yellowBorder);
-    //   } else {
-    //     myChart.data.datasets[1].backgroundColor.push(green);
-    //     myChart.data.datasets[1].borderColor.push(greenBorder);
-    //   }
+    if (rtt > 1000) {
+      chart_rtt.data.datasets[0].backgroundColor.push(red);
+      chart_rtt.data.datasets[0].borderColor.push(redBorder);
+    } else if (rtt > 500) {
+      chart_rtt.data.datasets[0].backgroundColor.push(orange);
+      chart_rtt.data.datasets[0].borderColor.push(orangeBorder);
+    } else if (rtt > 250) {
+      chart_rtt.data.datasets[0].backgroundColor.push(yellow);
+      chart_rtt.data.datasets[0].borderColor.push(yellowBorder);
+    } else {
+      chart_rtt.data.datasets[0].backgroundColor.push(green);
+      chart_rtt.data.datasets[0].borderColor.push(greenBorder);
+    }
 
-    myChart.update();
+    chart_bandwidth.update();
+    chart_rtt.update();
   }
 </script>
 
 <script>
-  // function getIPFromAmazon() {
-  //   fetch("https://checkip.amazonaws.com/")
-  //     .then((res) => res.text())
-  //     .then((data) => console.log(data));
-  // }
-
-  // getIPFromAmazon();
-
-  function getIP() {
-    fetch("https://api.ipify.org/")
-      .then((r) => r.text())
-      .then((r) => {
-        const IP = r;
-        document.getElementById("ip").innerText = IP;
-      })
-      .catch((error) => {
-        document.getElementById("ip").innerText = "Blocked by Ads Block";
-      });
-  }
-
-  getIP();
 
   function updateInformations() {
+    
     console.log("🔄 Informations changed");
     if (navigator.onLine === true) {
       document.getElementById("status").innerText = "online";
-      // console.log("✅ Connected");
+      document.getElementById("status").classList.toggle("online");
+      document.getElementById("status").classList.toggle("offline");
+      console.log("✅ Connected");
     } else {
       document.getElementById("status").innerText = "offline";
-      // console.log("❌ Disconnected");
+      document.getElementById("status").classList.toggle("online");
+      document.getElementById("status").classList.toggle("offline");
+      console.log("❌ Disconnected");
     }
 
     let type = navigator.connection.type;
@@ -209,16 +253,21 @@ function getUserIpAddr()
 
     window.addEventListener("online", function() {
       document.getElementById("status").innerText = "online";
-      update();
+      document.getElementById("status").classList.toggle("online");
+      document.getElementById("status").classList.toggle("offline");
+      updateLastUpdate();
     });
 
     window.addEventListener("offline", function() {
       document.getElementById("status").innerText = "offline";
-      update();
+      document.getElementById("status").classList.toggle("online");
+      document.getElementById("status").classList.toggle("offline");
+      updateLastUpdate();
     });
 
     updateLastUpdate();
     updateChart(moment().format("LTS"), downlink, rtt);
+    document.title = downlink + "mb/s" + " - " + rtt + "ms";
   }
 
   let lastUpdateDate;
