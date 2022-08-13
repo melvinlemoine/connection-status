@@ -248,19 +248,19 @@
 
 <script>
   // GET IP ##################################################
-  // function getIP() {
-  //   fetch("https://api.ipify.org/")
-  //     .then((r) => r.text())
-  //     .then((r) => {
-  //       const IP = r;
-  //       document.getElementById("ip").innerText = IP;
-  //     })
-  //     .catch((error) => {
-  //       document.getElementById("ip").innerText = "Blocked by Ads Block";
-  //     });
-  // }
+  function getIP() {
+    fetch("https://api.ipify.org/")
+      .then((r) => r.text())
+      .then((r) => {
+        const IP = r;
+        document.getElementById("ip").innerText = IP;
+      })
+      .catch((error) => {
+        document.getElementById("ip").innerText = "Blocked by ads/trackers blocker";
+      });
+  }
 
-  // getIP();
+  getIP();
 
   // END OF GET IP ##################################################
 
