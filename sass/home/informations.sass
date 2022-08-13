@@ -1,14 +1,22 @@
 .informations
     font-family: Fira
 
-    &__status
+    &__box
         display: grid
         grid-template-columns: repeat(2, 1fr)
         gap: 2rem
 
+        &_information
+            display: flex
+            align-items: center
+            // justify-content: center
+            padding: .5rem .75rem
+
+    &__status
+            
         &_connection
             color: white
-            padding: .5rem .75rem
+            // padding: .5rem .75rem
             font-weight: 900
             text-transform: uppercase
             font-family: fira
@@ -17,3 +25,7 @@
             &.offline
                 background-color: red
         &_ip
+            border: 2px solid $light
+    &__lastUpdate
+        opacity: .5
+        font-size: .75rem

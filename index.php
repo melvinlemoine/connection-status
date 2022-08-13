@@ -4,7 +4,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>Integration virgin template</title>
+  <title>Connection Status</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -13,20 +13,20 @@
 </head>
 
 <?php
-function getUserIpAddr()
-{
-  if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-    //ip from share internet
-    $ip = $_SERVER['HTTP_CLIENT_IP'];
-  } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-    //ip pass from proxy
-    $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-  } else {
-    $ip = $_SERVER['REMOTE_ADDR'];
-  }
-  return $ip;
-};
-?>
+// function getUserIpAddr()
+// {
+//   if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+//     //ip from share internet
+//     $ip = $_SERVER['HTTP_CLIENT_IP'];
+//   } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+//     //ip pass from proxy
+//     $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+//   } else {
+//     $ip = $_SERVER['REMOTE_ADDR'];
+//   }
+//   return $ip;
+// };
+// ?>
 
 <body class="body home">
   <header class="header pv-3">
@@ -40,18 +40,29 @@ function getUserIpAddr()
   <div class="informations">
 
     <div class="container mt-5">
-      <div class="informations__status">
-        <div class="informations__status_connection offline" id="status">waiting...</div>
-        <div>IP : <span id="ip"><?php echo getUserIpAddr(); ?></span></div>
+      <div class="informations__box informations__status">
+        <div class="informations__box_information informations__status_connection offline" id="status">waiting...</div>
+        <div class="informations__box_information informations__status_ip">IP :&nbsp;<span id="ip"><?php echo getUserIpAddr(); ?></span></div>
       </div>
 
-      <h1>Type : <span id="type">waiting...</span></h1>
-      <h1>Effective type : <span id="effectiveType">waiting...</span></h1>
-      <h1>downlinkMax : <span id="downlinkMax">waiting...</span></h1>
-      <h1>downlink : <span id="downlink">waiting...</span></h1>
-      <h1>RTT : <span id="rtt">waiting...</span></h1>
-      <h1>Last change : <span id="lastUpdate"></span></h1>
-      
+      <div class="informations__box">
+        <div class="informations__box_information">Type :&nbsp;<span id="type">waiting...</span></div>
+        <div class="informations__box_information">Effective type :&nbsp;<span id="effectiveType">waiting...</span></div>
+      </div>
+
+
+      <div class="informations__box">
+        <div class="informations__box_information">downlinkMax :&nbsp;<span id="downlinkMax">waiting...</span></div>
+        <div class="informations__box_information">downlink :&nbsp;<span id="downlink">waiting...</span></div>
+      </div>
+
+      <div class="informations__box">
+        <div class="informations__box_information">RTT :&nbsp;<span id="rtt">waiting...</span></div>
+      </div>
+
+
+      <div class="informations__lastUpdate">Last change : <span id="lastUpdate"></span></div>
+
     </div>
 
   </div>
@@ -161,53 +172,73 @@ function getUserIpAddr()
   const green = "rgba(75, 192, 192, 0.2)";
   const greenBorder = "rgb(75, 192, 192)";
 
-  function updateChart(date, downlink, rtt) {
+  let downlink;
+  let previous_downlink;
+
+  let rtt;
+  let previous_rtt;
+
+  let downlinkmax;
+  let previous_downlinkmax;
+
+  let type;
+  let previous_type;
+
+  let effectiveType;
+  let previous_effectiveType;
+
+
+  function updateChart(date, value, chart) {
     //   console.log("📊 Update chart");
 
-    if (chart_bandwidth.data.datasets[0].data > 10) {
-      chart_bandwidth.data.datasets[0].data.shift();
-      chart_rtt.data.datasets[0].data.shift();
-      console.log("Removed first element of array");
-    }
+    switch (chart) {
+      case "bandwidth":
+        chart_bandwidth.data.labels.push(date);
+        chart_bandwidth.data.datasets[0].data.push(value);
 
-    chart_bandwidth.data.labels.push(date);
-    chart_rtt.data.labels.push(date);
+        if (value > 5) {
+          chart_bandwidth.data.datasets[0].backgroundColor.push(green);
+          chart_bandwidth.data.datasets[0].borderColor.push(greenBorder);
+        } else if (value > 2.5) {
+          chart_bandwidth.data.datasets[0].backgroundColor.push(orange);
+          chart_bandwidth.data.datasets[0].borderColor.push(orangeBorder);
+        } else if (value > 1) {
+          chart_bandwidth.data.datasets[0].backgroundColor.push(yellow);
+          chart_bandwidth.data.datasets[0].borderColor.push(yellowBorder);
+        } else {
+          chart_bandwidth.data.datasets[0].backgroundColor.push(red);
+          chart_bandwidth.data.datasets[0].borderColor.push(redBorder);
+        }
 
-    chart_bandwidth.data.datasets[0].data.push(downlink);
-    chart_rtt.data.datasets[0].data.push(rtt);
+        if (chart_bandwidth.data.datasets[0].data.length > 10) {
+          chart_bandwidth.data.datasets[0].data.shift();
+          console.log("Removed first element of downlink array");
+        }
 
-    if (downlink > 5) {
-      chart_bandwidth.data.datasets[0].backgroundColor.push(green);
-      chart_bandwidth.data.datasets[0].borderColor.push(greenBorder);
-      // console.log("green");
-    } else if (downlink > 2.5) {
-      chart_bandwidth.data.datasets[0].backgroundColor.push(orange);
-      chart_bandwidth.data.datasets[0].borderColor.push(orangeBorder);
-      // console.log("orange");
-    } else if (downlink > 1) {
-      chart_bandwidth.data.datasets[0].backgroundColor.push(yellow);
-      chart_bandwidth.data.datasets[0].borderColor.push(yellowBorder);
-      // console.log("yellow");
-    } else {
-      chart_bandwidth.data.datasets[0].backgroundColor.push(red);
-      chart_bandwidth.data.datasets[0].borderColor.push(redBorder);
-      // console.log("red");
-    }
+        break;
+      case "rtt":
+        chart_rtt.data.labels.push(date);
+        chart_rtt.data.datasets[0].data.push(rtt);
 
-    //   myChart.data.datasets[1].data.push(rtt);
+        if (rtt > 1000) {
+          chart_rtt.data.datasets[0].backgroundColor.push(red);
+          chart_rtt.data.datasets[0].borderColor.push(redBorder);
+        } else if (rtt > 500) {
+          chart_rtt.data.datasets[0].backgroundColor.push(orange);
+          chart_rtt.data.datasets[0].borderColor.push(orangeBorder);
+        } else if (value > 250) {
+          chart_rtt.data.datasets[0].backgroundColor.push(yellow);
+          chart_rtt.data.datasets[0].borderColor.push(yellowBorder);
+        } else {
+          chart_rtt.data.datasets[0].backgroundColor.push(green);
+          chart_rtt.data.datasets[0].borderColor.push(greenBorder);
+        }
 
-    if (rtt > 1000) {
-      chart_rtt.data.datasets[0].backgroundColor.push(red);
-      chart_rtt.data.datasets[0].borderColor.push(redBorder);
-    } else if (rtt > 500) {
-      chart_rtt.data.datasets[0].backgroundColor.push(orange);
-      chart_rtt.data.datasets[0].borderColor.push(orangeBorder);
-    } else if (rtt > 250) {
-      chart_rtt.data.datasets[0].backgroundColor.push(yellow);
-      chart_rtt.data.datasets[0].borderColor.push(yellowBorder);
-    } else {
-      chart_rtt.data.datasets[0].backgroundColor.push(green);
-      chart_rtt.data.datasets[0].borderColor.push(greenBorder);
+        if (chart_rtt.data.datasets[0].data.length > 10) {
+          chart_rtt.data.datasets[0].data.shift();
+          console.log("Removed first element of rtt array");
+        }
+        break;
     }
 
     chart_bandwidth.update();
@@ -216,39 +247,69 @@ function getUserIpAddr()
 </script>
 
 <script>
+  // GET IP ##################################################
+  // function getIP() {
+  //   fetch("https://api.ipify.org/")
+  //     .then((r) => r.text())
+  //     .then((r) => {
+  //       const IP = r;
+  //       document.getElementById("ip").innerText = IP;
+  //     })
+  //     .catch((error) => {
+  //       document.getElementById("ip").innerText = "Blocked by Ads Block";
+  //     });
+  // }
+
+  // getIP();
+
+  // END OF GET IP ##################################################
+
+  let connection = false;
+
+  // CHECK CONNECTION WHEN PAGE LOAD ########################################
+  if (navigator.onLine === true) {
+    document.getElementById("status").innerText = "online";
+    document.getElementById("status").classList.toggle("online");
+    document.getElementById("status").classList.toggle("offline");
+    console.log("✅ Connected");
+    connection = true;
+  } else {
+    document.getElementById("status").innerText = "offline";
+    document.getElementById("status").classList.toggle("online");
+    document.getElementById("status").classList.toggle("offline");
+    console.log("❌ Disconnected");
+    connection = false;
+  }
+
+  // END OF CHECK CONNECTION WHEN PAGE LOAD ########################################
 
   function updateInformations() {
-    
+
     console.log("🔄 Informations changed");
-    if (navigator.onLine === true) {
-      document.getElementById("status").innerText = "online";
-      document.getElementById("status").classList.toggle("online");
-      document.getElementById("status").classList.toggle("offline");
-      console.log("✅ Connected");
-    } else {
-      document.getElementById("status").innerText = "offline";
-      document.getElementById("status").classList.toggle("online");
-      document.getElementById("status").classList.toggle("offline");
-      console.log("❌ Disconnected");
-    }
+
 
     let type = navigator.connection.type;
-    document.getElementById("type").innerText = type;
+    if (type) {
+      document.getElementById("type").innerText = type;
+    } else {
+      document.getElementById("type").innerText = "unknown";
+    }
 
-    let effectiveType = navigator.connection.effectiveType;
+
+    effectiveType = navigator.connection.effectiveType;
     document.getElementById("effectiveType").innerText = effectiveType;
 
-    let downlinkMax = navigator.connection.downlinkMax;
+    downlinkMax = navigator.connection.downlinkMax;
     if (downlinkMax) {
       document.getElementById("downlinkMax").innerText = downlinkMax + "mb/s";
     } else {
       document.getElementById("downlinkMax").innerText = "unknown";
     }
 
-    let downlink = navigator.connection.downlink;
+    downlink = navigator.connection.downlink;
     document.getElementById("downlink").innerText = downlink + "mb/s";
 
-    let rtt = navigator.connection.rtt;
+    rtt = navigator.connection.rtt;
     document.getElementById("rtt").innerText = rtt + "ms";
 
     window.addEventListener("online", function() {
@@ -256,18 +317,38 @@ function getUserIpAddr()
       document.getElementById("status").classList.toggle("online");
       document.getElementById("status").classList.toggle("offline");
       updateLastUpdate();
+      connection = true;
     });
 
     window.addEventListener("offline", function() {
       document.getElementById("status").innerText = "offline";
       document.getElementById("status").classList.toggle("online");
       document.getElementById("status").classList.toggle("offline");
+      connection = false;
       updateLastUpdate();
     });
 
     updateLastUpdate();
-    updateChart(moment().format("LTS"), downlink, rtt);
-    document.title = downlink + "mb/s" + " - " + rtt + "ms";
+    if (previous_downlink != downlink) {
+      updateChart(moment().format("LTS"), downlink, "bandwidth");
+      previous_downlink = downlink;
+    }
+    if (previous_rtt != rtt) {
+      updateChart(moment().format("LTS"), rtt, "rtt");
+      previous_rtt = rtt;
+    }
+
+
+
+    // UPDATE CONNECTION STATUS ##################################################
+    if (connection) {
+      document.title = "✅ " + downlink + "mb/s" + " - " + rtt + "ms";
+    } else {
+      document.title = "❌ " + downlink + "mb/s" + " - " + rtt + "ms";
+    }
+
+    // END OF CONNECTION STATUS ##################################################
+
   }
 
   let lastUpdateDate;

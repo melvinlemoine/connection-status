@@ -60,15 +60,20 @@
   font-family: Fira;
 }
 
-.home .informations__status {
+.home .informations__box {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 2rem;
 }
 
+.home .informations__box_information {
+  display: flex;
+  align-items: center;
+  padding: .5rem .75rem;
+}
+
 .home .informations__status_connection {
   color: white;
-  padding: .5rem .75rem;
   font-weight: 900;
   text-transform: uppercase;
   font-family: fira;
@@ -80,6 +85,15 @@
 
 .home .informations__status_connection.offline {
   background-color: red;
+}
+
+.home .informations__status_ip {
+  border: 2px solid #F3F5FD;
+}
+
+.home .informations__lastUpdate {
+  opacity: .5;
+  font-size: .75rem;
 }
 
 .home .charts {
