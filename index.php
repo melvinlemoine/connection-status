@@ -42,7 +42,7 @@
     <div class="container mt-5">
       <div class="informations__box informations__status">
         <div class="informations__box_information informations__status_connection offline" id="status">waiting...</div>
-        <div class="informations__box_information informations__status_ip">IP :&nbsp;<span id="ip"><?php echo getUserIpAddr(); ?></span></div>
+        <div class="informations__box_information informations__status_ip">IP :&nbsp;<span id="ip">Waiting...</span></div>
       </div>
 
       <div class="informations__box">
