@@ -212,6 +212,8 @@
 
         if (chart_bandwidth.data.datasets[0].data.length > 10) {
           chart_bandwidth.data.datasets[0].data.shift();
+          chart_bandwidth.data.datasets[0].backgroundColor.shift();
+          chart_bandwidth.data.datasets[0].borderColor.shift();
           console.log("Removed first element of downlink array");
         }
 
@@ -236,6 +238,8 @@
 
         if (chart_rtt.data.datasets[0].data.length > 10) {
           chart_rtt.data.datasets[0].data.shift();
+          chart_rtt.data.datasets[0].backgroundColor.shift();
+          chart_rtt.data.datasets[0].borderColor.shift();
           console.log("Removed first element of rtt array");
         }
         break;
