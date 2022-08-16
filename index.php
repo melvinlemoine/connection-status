@@ -270,28 +270,65 @@
 
   // END OF GET IP ##################################################
 
-  let connection = false;
+  // LAST UPDATE FUNCTION################################################################################
+
+  let lastUpdateDate;
+  let updating;
+
+  function updateLastUpdate() {
+    console.log("🔄 LastUpdate updated");
+    if (updating) {
+      clearInterval(updating);
+    }
+
+    // SET RELATIVE DATE ON LAST UPDATE
+    lastUpdateDate = moment().format("LTS");
+    document.getElementById("lastUpdate").innerText = moment(lastUpdateDate, "hh:mm:ss").fromNow();
+
+    // UPDATE MOMENT RELATIVE DATE
+    updating = setInterval(function() {
+      document.getElementById("lastUpdate").innerText = moment(lastUpdateDate, "hh:mm:ss").fromNow();
+    }, 5000);
+  }
+
+  // END OF LAST UPDATE FUNCTION ######################################################################
+
+
+
 
   // CHECK CONNECTION WHEN PAGE LOAD ########################################
+
+  let connection = false;
+
   if (navigator.onLine === true) {
-    document.getElementById("status").innerText = "online";
-    document.getElementById("status").classList.toggle("online");
-    document.getElementById("status").classList.toggle("offline");
-    console.log("✅ Connected");
-    connection = true;
+    goOnline();
   } else {
-    document.getElementById("status").innerText = "offline";
-    document.getElementById("status").classList.toggle("online");
-    document.getElementById("status").classList.toggle("offline");
-    console.log("❌ Disconnected");
+    goOffline();
+  }
+
+  function goOnline() {
+    document.getElementById("status").innerText = "Online";
+    document.getElementById("status").classList.remove("offline");
+    document.getElementById("status").classList.add("online");
+    connection = true;
+    console.log("✅ Connection restored");
+    updateLastUpdate();
+  }
+
+  function goOffline() {
+    document.getElementById("status").innerText = "Offline";
+    document.getElementById("status").classList.remove("online");
+    document.getElementById("status").classList.add("offline");
     connection = false;
+    console.log("❌ Connection lost");
+    updateLastUpdate();
   }
 
   // END OF CHECK CONNECTION WHEN PAGE LOAD ########################################
 
   function updateInformations() {
 
-    console.log("🔄 Informations changed");
+    console.log("🔄 Informations Updated");
 
     let type = navigator.connection.type;
     if (type) {
@@ -321,35 +358,28 @@
     document.getElementById("saveData").innerText = saveData;
 
     window.addEventListener("online", function() {
-      document.getElementById("status").innerText = "online";
-      document.getElementById("status").classList.toggle("online");
-      document.getElementById("status").classList.toggle("offline");
-      updateLastUpdate();
-      connection = true;
+      goOnline();
     });
 
     window.addEventListener("offline", function() {
-      document.getElementById("status").innerText = "offline";
-      document.getElementById("status").classList.toggle("online");
-      document.getElementById("status").classList.toggle("offline");
-      connection = false;
-      updateLastUpdate();
+      goOffline();
     });
 
+    // UPDATE LAST UPDATE AFTER UPDATE INFORMATIONS AND BEFORE ADD DATA TO CHART
     updateLastUpdate();
 
+    // IF DATA DON'T CHANGED, NO CHART INSERT
     if (previous_downlink != downlink) {
-      updateChart(moment().format("LTS"), downlink, "bandwidth");
+      updateChart(lastUpdateDate, downlink, "bandwidth");
       previous_downlink = downlink;
     }
     if (previous_rtt != rtt) {
-      updateChart(moment().format("LTS"), rtt, "rtt");
+      updateChart(lastUpdateDate, rtt, "rtt");
       previous_rtt = rtt;
     }
 
-
-
     // UPDATE CONNECTION STATUS ##################################################
+
     if (connection) {
       document.title = "✅ " + downlink + "mb/s" + " - " + rtt + "ms";
     } else {
@@ -357,30 +387,12 @@
     }
 
     // END OF CONNECTION STATUS ##################################################
-
   }
 
-  let lastUpdateDate;
-  let updating;
-
-  function updateLastUpdate() {
-    // console.log("update function");
-    if (updating) {
-      clearInterval(updating);
-    }
-
-    lastUpdateDate = moment().format("LTS");
-    document.getElementById("lastUpdate").innerText = moment(lastUpdateDate, "hh:mm:ss").fromNow();
-
-    updating = setInterval(function() {
-      document.getElementById("lastUpdate").innerText = moment(lastUpdateDate, "hh:mm:ss").fromNow();
-      // console.log("update interval");
-    }, 5000);
-  }
-
+  // WHEN NAVIGATOR CONNECTION INFORMATIONS CHANGES, UPDATE INFORMATIONS
   navigator.connection.addEventListener("change", updateInformations);
-
-  updateInformations();
+  // INITIALIZE INFORMATIONS
+  updateInformations()
 </script>
 
 </html>
