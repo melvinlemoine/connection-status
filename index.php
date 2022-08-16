@@ -26,7 +26,8 @@
 //   }
 //   return $ip;
 // };
-// ?>
+// 
+?>
 
 <body class="body home">
   <header class="header pv-3">
@@ -58,6 +59,10 @@
 
       <div class="informations__box">
         <div class="informations__box_information">RTT :&nbsp;<span id="rtt">waiting...</span></div>
+      </div>
+
+      <div class="informations__box">
+        <div class="informations__box_information">saveData :&nbsp;<span id="saveData">waiting...</span></div>
       </div>
 
 
@@ -187,6 +192,8 @@
   let effectiveType;
   let previous_effectiveType;
 
+  let saveData;
+  let previous_saveData;
 
   function updateChart(date, value, chart) {
     //   console.log("📊 Update chart");
@@ -214,10 +221,13 @@
           chart_bandwidth.data.datasets[0].data.shift();
           chart_bandwidth.data.datasets[0].backgroundColor.shift();
           chart_bandwidth.data.datasets[0].borderColor.shift();
-          console.log("Removed first element of downlink array");
+          console.log("Removed first element of data bandwidth array. Now : " + chart_rtt.data.datasets[0].data.length);
+          console.log("Removed first element of bg bandwidth array. Now : " + chart_rtt.data.datasets[0].backgroundColor.length);
+          console.log("Removed first element of border bandwidth array. Now : " + chart_rtt.data.datasets[0].borderColor.length);
         }
-
+        chart_bandwidth.update();
         break;
+        
       case "rtt":
         chart_rtt.data.labels.push(date);
         chart_rtt.data.datasets[0].data.push(rtt);
@@ -240,13 +250,17 @@
           chart_rtt.data.datasets[0].data.shift();
           chart_rtt.data.datasets[0].backgroundColor.shift();
           chart_rtt.data.datasets[0].borderColor.shift();
-          console.log("Removed first element of rtt array");
+          console.log("Removed first element of data rtt array. Now : " + chart_rtt.data.datasets[0].data.length);
+          console.log("Removed first element of bg rtt array. Now : " + chart_rtt.data.datasets[0].backgroundColor.length);
+          console.log("Removed first element of border rtt array. Now : " + chart_rtt.data.datasets[0].borderColor.length);
         }
+        console.log(chart_rtt.data.datasets[0].data);
+        chart_rtt.update();
         break;
     }
 
-    chart_bandwidth.update();
-    chart_rtt.update();
+
+
   }
 </script>
 
@@ -291,7 +305,6 @@
 
     console.log("🔄 Informations changed");
 
-
     let type = navigator.connection.type;
     if (type) {
       document.getElementById("type").innerText = type;
@@ -316,6 +329,9 @@
     rtt = navigator.connection.rtt;
     document.getElementById("rtt").innerText = rtt + "ms";
 
+    saveData = navigator.connection.saveData;
+    document.getElementById("saveData").innerText = saveData;
+
     window.addEventListener("online", function() {
       document.getElementById("status").innerText = "online";
       document.getElementById("status").classList.toggle("online");
@@ -333,6 +349,7 @@
     });
 
     updateLastUpdate();
+
     if (previous_downlink != downlink) {
       updateChart(moment().format("LTS"), downlink, "bandwidth");
       previous_downlink = downlink;
