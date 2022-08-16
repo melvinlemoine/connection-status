@@ -22,8 +22,8 @@
   <div class="informations">
 
     <div class="container mt-5 informations__grid">
-      <div class="informations__grid_information informations__status_connection offline" id="status">waiting...</div>
-      <div class="informations__grid_information informations__status_ip">IP :&nbsp;<span id="ip">No IP</span></div>
+      <div class="informations__grid_information informations__grid_information--connection offline" id="status">waiting...</div>
+      <div class="informations__grid_information informations__grid_information--ip">IP :&nbsp;<span id="ip">No IP</span></div>
 
       <div class="informations__grid_information">Type :&nbsp;<span id="type">waiting...</span></div>
       <div class="informations__grid_information">Effective type :&nbsp;<span id="effectiveType">waiting...</span></div>
@@ -227,7 +227,7 @@
         }
         console.log("RTT DATA (" + chart_rtt.data.datasets[0].data.length + ")");
         for(i = 0; i < chart_rtt.data.datasets[0].data.length; i++){
-          console.log("- " + chart_rtt.data.datasets[0].data[i] + " _ " + date);
+          console.log("- " + chart_rtt.data.datasets[0].data[i] + " _ " + chart_rtt.data.labels[i]);
         }
         
         chart_rtt.update();
