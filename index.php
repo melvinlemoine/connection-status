@@ -23,19 +23,19 @@
 
     <div class="container mt-5 informations__grid">
       <div class="informations__grid_information informations__grid_information--connection offline" id="status">waiting...</div>
-      <div class="informations__grid_information informations__grid_information--ip">IP :&nbsp;<span id="ip">No IP</span></div>
+      <div class="informations__grid_information informations__grid_information--ip" id="ip--box">🌐 IP :&nbsp;<span id="ip">No IP</span></div>
 
-      <div class="informations__grid_information">Type :&nbsp;<span id="type">waiting...</span></div>
-      <div class="informations__grid_information">Effective type :&nbsp;<span id="effectiveType">waiting...</span></div>
+      <div class="informations__grid_information" id="type--box">Type :&nbsp;<span id="type">waiting...</span></div>
+      <div class="informations__grid_information" id="effectiveType--box">📶 Effective type :&nbsp;<span id="effectiveType">waiting...</span></div>
 
 
-      <div class="informations__grid_information">downlink :&nbsp;<span id="downlink">waiting...</span></div>
-      <div class="informations__grid_information">RTT :&nbsp;<span id="rtt">waiting...</span></div>
+      <div class="informations__grid_information" id="downlink--box">⬇️ downlink :&nbsp;<span id="downlink">waiting...</span></div>
+      <div class="informations__grid_information" id="rtt--box">🔂 RTT :&nbsp;<span id="rtt">waiting...</span></div>
 
-      <div class="informations__grid_information">downlinkMax :&nbsp;<span id="downlinkMax">waiting...</span></div>
-      <div class="informations__grid_information">saveData :&nbsp;<span id="saveData">waiting...</span></div>
+      <div class="informations__grid_information" id="downlinkMax--box">downlinkMax :&nbsp;<span id="downlinkMax">waiting...</span></div>
+      <div class="informations__grid_information">🛡 saveData :&nbsp;<span id="saveData">waiting...</span></div>
 
-      <div class="informations__lastUpdate">Last change : <span id="lastUpdate"></span></div>
+      <div class="informations__lastUpdate">⏱ Last change : <span id="lastUpdate"></span></div>
 
     </div>
 
@@ -57,10 +57,10 @@
 </body>
 
 <script src="assets/js/moment.min.js"></script>
-<script src="assets/js/moment_fr.min.js"></script>
-<script>
+<!-- <script src="assets/js/moment_fr.min.js"></script> -->
+<!-- <script>
   moment.locale("fr");
-</script>
+</script> -->
 <script src="assets/js/chart.min.js"></script>
 <!-- <script src="assets/js/chartjs-plugin-datalabels.min.js"></script> -->
 
@@ -96,6 +96,12 @@
       responsive: true,
       maintainAspectRatio: false,
       fill: true,
+      scales: {
+        y: {
+          suggestedMin: 0,
+          suggestedMax: 10
+        },
+      },
       plugins: {
         legend: {
           display: false,
@@ -118,6 +124,10 @@
       responsive: true,
       maintainAspectRatio: false,
       fill: true,
+      y: {
+        suggestedMin: 0,
+        suggestedMax: 8000
+      },
       plugins: {
         legend: {
           display: false,
@@ -134,16 +144,16 @@
   const chart_bandwidth = new Chart(document.getElementById("chart-bandwidth"), config_bandwidth);
   const chart_rtt = new Chart(document.getElementById("chart-rtt"), config_rtt);
 
-  const red = "rgba(255, 99, 132, 0.2)";
+  const red = "rgba(255, 99, 132, 0.75)";
   const redBorder = "rgb(255, 99, 132)";
 
-  const orange = "rgba(255, 159, 64, 0.2)";
+  const orange = "rgba(255, 159, 64, 0.75)";
   const orangeBorder = "rgb(255, 159, 64)";
 
-  const yellow = "rgba(255, 205, 86, 0.2)";
+  const yellow = "rgba(255, 205, 86, 0.75)";
   const yellowBorder = "rgb(255, 205, 86)";
 
-  const green = "rgba(75, 192, 192, 0.2)";
+  const green = "rgba(75, 192, 192, 0.75)";
   const greenBorder = "rgb(75, 192, 192)";
 
   let downlink;
@@ -172,16 +182,16 @@
         chart_bandwidth.data.labels.push(date);
         chart_bandwidth.data.datasets[0].data.push(value);
 
-        if (value > 5) {
+        if (value > downlink_green) {
           chart_bandwidth.data.datasets[0].backgroundColor.push(green);
           chart_bandwidth.data.datasets[0].borderColor.push(greenBorder);
-        } else if (value > 2.5) {
+        } else if (value > downlink_orange) {
           chart_bandwidth.data.datasets[0].backgroundColor.push(orange);
           chart_bandwidth.data.datasets[0].borderColor.push(orangeBorder);
-        } else if (value > 1) {
+        } else if (value > downlink_yellow) {
           chart_bandwidth.data.datasets[0].backgroundColor.push(yellow);
           chart_bandwidth.data.datasets[0].borderColor.push(yellowBorder);
-        } else {
+        } else if (value > downlink_red) {
           chart_bandwidth.data.datasets[0].backgroundColor.push(red);
           chart_bandwidth.data.datasets[0].borderColor.push(redBorder);
         }
@@ -202,16 +212,16 @@
         chart_rtt.data.labels.push(date);
         chart_rtt.data.datasets[0].data.push(rtt);
 
-        if (rtt > 1000) {
+        if (rtt > rtt_red) {
           chart_rtt.data.datasets[0].backgroundColor.push(red);
           chart_rtt.data.datasets[0].borderColor.push(redBorder);
-        } else if (rtt > 500) {
+        } else if (rtt > rtt_orange) {
           chart_rtt.data.datasets[0].backgroundColor.push(orange);
           chart_rtt.data.datasets[0].borderColor.push(orangeBorder);
-        } else if (value > 250) {
+        } else if (value > rtt_yellow) {
           chart_rtt.data.datasets[0].backgroundColor.push(yellow);
           chart_rtt.data.datasets[0].borderColor.push(yellowBorder);
-        } else {
+        } else if (value > rtt_green) {
           chart_rtt.data.datasets[0].backgroundColor.push(green);
           chart_rtt.data.datasets[0].borderColor.push(greenBorder);
         }
@@ -226,10 +236,10 @@
           console.log("Removed first element of border rtt array. Now : " + chart_rtt.data.datasets[0].borderColor.length);
         }
         console.log("RTT DATA (" + chart_rtt.data.datasets[0].data.length + ")");
-        for(i = 0; i < chart_rtt.data.datasets[0].data.length; i++){
+        for (i = 0; i < chart_rtt.data.datasets[0].data.length; i++) {
           console.log("- " + chart_rtt.data.datasets[0].data[i] + " _ " + chart_rtt.data.labels[i]);
         }
-        
+
         chart_rtt.update();
         break;
     }
@@ -253,16 +263,15 @@
 
     // SET RELATIVE DATE ON LAST UPDATE
     lastUpdateDate = moment().format("LTS");
-    document.getElementById("lastUpdate").innerText = moment(lastUpdateDate, "hh:mm:ss").fromNow();
+    document.getElementById("lastUpdate").innerText = moment(lastUpdateDate, "h:mm:ss a").fromNow();
 
     // UPDATE MOMENT RELATIVE DATE
     updating = setInterval(function() {
-      document.getElementById("lastUpdate").innerText = moment(lastUpdateDate, "hh:mm:ss").fromNow();
+      document.getElementById("lastUpdate").innerText = moment(lastUpdateDate, "h:mm:ss a").fromNow();
     }, 5000);
   }
 
   // END OF LAST UPDATE FUNCTION ######################################################################
-
 
 
 
@@ -277,7 +286,7 @@
   }
 
   function goOnline() {
-    document.getElementById("status").innerText = "Online";
+    document.getElementById("status").innerText = "✅ Online";
     document.getElementById("status").classList.remove("offline");
     document.getElementById("status").classList.add("online");
     connection = true;
@@ -287,7 +296,7 @@
   }
 
   function goOffline() {
-    document.getElementById("status").innerText = "Offline";
+    document.getElementById("status").innerText = "❌ Offline";
     document.getElementById("status").classList.remove("online");
     document.getElementById("status").classList.add("offline");
     connection = false;
@@ -306,7 +315,10 @@
 
   // END OF CHECK CONNECTION WHEN PAGE LOAD ########################################
 
+
+
   // GET IP ##################################################
+
   function getIP() {
     document.getElementById("ip").innerText = "Reaching IP...";
     fetch("https://api.ipify.org/")
@@ -328,34 +340,122 @@
 
   // UPDATE INFORMATIONS FUNCTION ##################################################
 
+  let previous_effectiveType_color;
+  let previous_rtt_color;
+  let previous_downlink_color;
+
+  // RTT COLORS
+  let rtt_green = 500;
+  let rtt_yellow = 1000;
+  let rtt_orange = 2000;
+  let rtt_red = 3000;
+
+  // DOWNLINK COLORS
+  let downlink_green = 2.5;
+  let downlink_yellow = 2;
+  let downlink_orange = 1;
+  let downlink_red = 0;
+
   function updateInformations() {
 
     console.log("🔄 Informations Updated");
 
     if (connection) {
-      let type = navigator.connection.type;
+
+      // let type = 'Not supported';
+      // let downlinkMax = 'not supported';
+
+      // if ('connection' in navigator) {
+      //   type = navigator.connection.effectiveType;
+
+      //   if ('downlinkMax' in navigator.connection) {
+      //     console.log("downlinkMax is in navigator.connection");
+      //     let downlinkMax = navigator.connection.downlinkMax;
+      //   } else {
+      //     console.log("downlinkMax is not in navigator.connection");
+      //   }
+      // }
+
+      type = navigator.connection.type;
       if (type) {
         document.getElementById("type").innerText = type;
+        document.getElementById('type--box').classList.remove('not-supported');
       } else {
-        document.getElementById("type").innerText = "unknown";
+        document.getElementById("type").innerText = "Not supported";
+        document.getElementById('type--box').classList.add('not-supported');
       }
-
 
       effectiveType = navigator.connection.effectiveType;
       document.getElementById("effectiveType").innerText = effectiveType;
 
+
+      document.getElementById('effectiveType--box').classList.remove(previous_effectiveType_color);
+      switch (effectiveType) {
+        case "4g":
+          document.getElementById('effectiveType--box').classList.add('green');
+          previous_effectiveType_color = "green";
+          break;
+        case "3g":
+          document.getElementById('effectiveType--box').classList.add('yellow');
+          previous_effectiveType_color = "yellow";
+          break;
+        case "2g":
+          document.getElementById('effectiveType--box').classList.add('orange');
+          previous_effectiveType_color = "orange";
+          break;
+        case "slow-2g":
+          document.getElementById('effectiveType--box').classList.add('red');
+          previous_effectiveType_color = "red";
+          break;
+
+      }
+
       downlinkMax = navigator.connection.downlinkMax;
       if (downlinkMax) {
         document.getElementById("downlinkMax").innerText = downlinkMax + "mb/s";
+        document.getElementById('downlinkMax--box').classList.remove('not-supported');
       } else {
-        document.getElementById("downlinkMax").innerText = "unknown";
+        document.getElementById("downlinkMax").innerText = "Not supported";
+        document.getElementById('downlinkMax--box').classList.add('not-supported');
       }
 
       downlink = navigator.connection.downlink;
-      document.getElementById("downlink").innerText = downlink + "mb/s";
+
+      if (downlink >= 10) {
+        document.getElementById("downlink").innerText = "+" + downlink + "mb/s";
+      } else {
+        document.getElementById("downlink").innerText = downlink + "mb/s";
+      }
+
+      document.getElementById('downlink--box').classList.remove(previous_downlink_color);
+      console.log("previous_downlink_color : " + previous_downlink_color);
+
+      if (downlink > downlink_green) {
+        document.getElementById('downlink--box').classList.add('green');
+        previous_downlink_color = "green";
+      } else if (downlink > downlink_yellow) {
+        document.getElementById('downlink--box').classList.add('yellow');
+        previous_downlink_color = "yellow";
+      } else if (downlink > downlink_orange) {
+        document.getElementById('downlink--box').classList.add('orange');
+        previous_downlink_color = "orange";
+      } else if (downlink > downlink_red) {
+        document.getElementById('downlink--box').classList.add('red');
+        previous_downlink_color = "red";
+      }
 
       rtt = navigator.connection.rtt;
       document.getElementById("rtt").innerText = rtt + "ms";
+
+      if (rtt > rtt_red) {
+        document.getElementById('rtt--box').classList.add('red');
+      } else if (rtt > rtt_orange) {
+        document.getElementById('rtt--box').classList.add('orange');
+      } else if (rtt > rtt_yellow) {
+        document.getElementById('rtt--box').classList.add('yellow');
+      } else if (rtt > rtt_green) {
+        document.getElementById('rtt--box').classList.add('green');
+      }
 
       saveData = navigator.connection.saveData;
       document.getElementById("saveData").innerText = saveData;
