@@ -1,19 +1,21 @@
 .informations
     font-family: Fira
 
-    &__box
+    &__grid
         display: grid
         grid-template-columns: repeat(2, 1fr)
-        gap: 2rem
+        gap: 1rem
+        // border: 1px solid red
 
         &_information
             display: flex
             align-items: center
-            // justify-content: center
+                // justify-content: center
             padding: .5rem .75rem
+            // border: 1px solid blue
 
     &__status
-            
+
         &_connection
             color: white
             // padding: .5rem .75rem
@@ -29,3 +31,4 @@
     &__lastUpdate
         opacity: .5
         font-size: .75rem
+        grid-column: 1 / span 2

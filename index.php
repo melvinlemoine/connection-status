@@ -40,31 +40,19 @@
 
   <div class="informations">
 
-    <div class="container mt-5">
-      <div class="informations__box informations__status">
-        <div class="informations__box_information informations__status_connection offline" id="status">waiting...</div>
-        <div class="informations__box_information informations__status_ip">IP :&nbsp;<span id="ip">Waiting...</span></div>
-      </div>
+    <div class="container mt-5 informations__grid">
+      <div class="informations__grid_information informations__status_connection offline" id="status">waiting...</div>
+      <div class="informations__grid_information informations__status_ip">IP :&nbsp;<span id="ip">Waiting...</span></div>
 
-      <div class="informations__box">
-        <div class="informations__box_information">Type :&nbsp;<span id="type">waiting...</span></div>
-        <div class="informations__box_information">Effective type :&nbsp;<span id="effectiveType">waiting...</span></div>
-      </div>
+      <div class="informations__grid_information">Type :&nbsp;<span id="type">waiting...</span></div>
+      <div class="informations__grid_information">Effective type :&nbsp;<span id="effectiveType">waiting...</span></div>
 
 
-      <div class="informations__box">
-        <div class="informations__box_information">downlinkMax :&nbsp;<span id="downlinkMax">waiting...</span></div>
-        <div class="informations__box_information">downlink :&nbsp;<span id="downlink">waiting...</span></div>
-      </div>
+      <div class="informations__grid_information">downlink :&nbsp;<span id="downlink">waiting...</span></div>
+      <div class="informations__grid_information">RTT :&nbsp;<span id="rtt">waiting...</span></div>
 
-      <div class="informations__box">
-        <div class="informations__box_information">RTT :&nbsp;<span id="rtt">waiting...</span></div>
-      </div>
-
-      <div class="informations__box">
-        <div class="informations__box_information">saveData :&nbsp;<span id="saveData">waiting...</span></div>
-      </div>
-
+      <div class="informations__grid_information">downlinkMax :&nbsp;<span id="downlinkMax">waiting...</span></div>
+      <div class="informations__grid_information">saveData :&nbsp;<span id="saveData">waiting...</span></div>
 
       <div class="informations__lastUpdate">Last change : <span id="lastUpdate"></span></div>
 
@@ -227,7 +215,7 @@
         }
         chart_bandwidth.update();
         break;
-        
+
       case "rtt":
         chart_rtt.data.labels.push(date);
         chart_rtt.data.datasets[0].data.push(rtt);
