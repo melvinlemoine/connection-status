@@ -5,6 +5,22 @@
     <meta charset="UTF-8" />
     <title>Connection Status</title>
 
+    <meta name="title" content="Connection Status ｜ Check your connection status" />
+    <meta property="og:site_name" content="Connection Status" />
+    <meta property="og:url" content="https://www.connection-status.info" />·
+
+    <meta property="og:type" content="website" />
+
+    <meta name="description" content="Check your connection status : speed, ping, IP, bandwidth in real time !" />
+    <meta name="keywords" content="bandwidth, speed, speedtest, IP, ping, network, status, monitoring" />
+    <meta name="author" content="Melvin Lemoine" />
+    
+    <meta property="og:image" content="assets/images/ogimage.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Connection Status Open Graph image cover" />
+
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <link rel="icon" type="image/png" href="assets/images/favicon.png" />
@@ -74,9 +90,9 @@
           ↔️ Ping :&nbsp;<span id="ping">Pinging...</span>
         </div>
 
-        <div class="informations__grid_information">🛡 saveData :&nbsp;<span id="saveData">waiting...</span></div>
+        <!-- <div class="informations__grid_information">🛡 saveData :&nbsp;<span id="saveData">waiting...</span></div> -->
 
-        <div class="informations__lastUpdate">⏱ Last change : <span id="lastUpdate"></span></div>
+        <div class="informations__lastUpdate">⏱ Last network informations change : <span id="lastUpdate"></span></div>
       </div>
     </div>
 
@@ -115,45 +131,61 @@
     const green = "rgba(75, 192, 192, 0.75)";
     const greenBorder = "rgb(75, 192, 192)";
 
+    const grey = "rgba(201, 203, 207, 0.75)";
+    const greyBorder = "rgba(201, 203, 207)";
+
     // You may use Promise if the browser supports ES6
     var p = new Ping();
-    let pinging; // Set Interval
+    // let pinging; // Set Interval
     let ping;
 
     function launchPing() {
-      console.log("launchPing");
-      pinging = setInterval(function () {
-        p.ping("https://google.com")
-          .then((data) => {
-            // console.log("Successful ping: " + data);
-            ping = data;
-            document.getElementById("ping").innerText = data + "ms";
-            document.getElementById("ping--box").classList.remove(previous_ping_color);
+      // console.log("launchPing");
+      p.ping("https://google.com")
+        .then((data) => {
+          // console.log("Successful ping: " + data);
+          ping = data;
+          document.getElementById("ping").innerText = data + "ms";
+          document.getElementById("ping--box").classList.remove(previous_ping_color);
 
-            if (ping > ping_red) {
-              document.getElementById("ping--box").classList.add("red");
-              previous_ping_color = "red";
-            } else if (ping > ping_orange) {
-              document.getElementById("ping--box").classList.add("orange");
-              previous_ping_color = "orange";
-            } else if (ping > ping_yellow) {
-              document.getElementById("ping--box").classList.add("yellow");
-              previous_ping_color = "yellow";
-            } else if (ping < ping_green < ping_yellow) {
-              document.getElementById("ping--box").classList.add("green");
-              previous_ping_color = "green";
-            }
-            updateTitle();
-            // updateLastUpdate();
-            updateChart(moment().format("LTS", "h:mm:ss a"), ping, "ping");
-          })
-          .catch((ping) => {
-            document.getElementById("ping").innerText = "Timeout ⚠️";
+          if (ping > ping_red) {
             document.getElementById("ping--box").classList.add("red");
             previous_ping_color = "red";
-            updateChart(moment().format("LTS", "h:mm:ss a"), 0, "ping");
-          });
-      }, 3000);
+          } else if (ping > ping_orange) {
+            document.getElementById("ping--box").classList.add("orange");
+            previous_ping_color = "orange";
+          } else if (ping > ping_yellow) {
+            document.getElementById("ping--box").classList.add("yellow");
+            previous_ping_color = "yellow";
+          } else if (ping < ping_green < ping_yellow) {
+            document.getElementById("ping--box").classList.add("green");
+            previous_ping_color = "green";
+          }
+          // setTimeout(function () {
+          //   launchPing();
+          //   console.log("launchPing from success");
+          // }, 3000);
+
+          updateTitle();
+          // updateLastUpdate();
+          updateChart(moment().format("LTS", "h:mm:ss a"), ping, "ping");
+        })
+        .catch((ping) => {
+          document.getElementById("ping").innerText = "Timeout ⚠️";
+          document.getElementById("ping--box").classList.add("red");
+          previous_ping_color = "red";
+          updateChart(moment().format("LTS", "h:mm:ss a"), "timeout", "ping");
+          // setTimeout(function () {
+          //   launchPing();
+          //   console.log("launchPing from error");
+          // }, 3000);
+        })
+        .then((ping) => {
+          setTimeout(function () {
+            launchPing();
+            console.log("launchPing from last then");
+          }, 3000);
+        });
     }
   </script>
 
@@ -211,6 +243,7 @@
           data: [],
           backgroundColor: [],
           borderColor: [],
+          borderSkipped: "start",
           borderWidth: 1,
           // tension: 0.25,
         },
@@ -316,8 +349,8 @@
     let effectiveType;
     let previous_effectiveType;
 
-    let saveData;
-    let previous_saveData;
+    // let saveData;
+    // let previous_saveData;
 
     function updateChart(date, value, chart) {
       //   console.log("📊 Update chart");
@@ -397,8 +430,16 @@
           chart_rtt.update();
           break;
         case "ping":
+          console.log("ping chart update");
           chart_ping.data.labels.push("");
-          chart_ping.data.datasets[0].data.push(ping);
+          if (ping == "timeout") {
+            chart_ping.data.datasets[0].data.push(
+              chart_ping.data.datasets[0].data[chart_ping.data.datasets[0].data.length - 1]
+            );
+          } else {
+            chart_ping.data.datasets[0].data.push(ping);
+            chart_ping.data.labels[chart_ping.data.labels.length - 3] = "";
+          }
 
           if (value >= ping_red) {
             // chart_ping.data.datasets[0].backgroundColor.shift();
@@ -415,6 +456,12 @@
             // chart_ping.data.datasets[0].borderColor.shift();
             chart_ping.data.datasets[0].backgroundColor.push(yellow);
             chart_ping.data.datasets[0].borderColor.push(yellowBorder);
+          } else if (value == "timeout") {
+            // chart_ping.data.datasets[0].backgroundColor.shift();
+            // chart_ping.data.datasets[0].borderColor.shift();
+            chart_ping.data.labels[chart_ping.data.labels.length - 2] = date;
+            chart_ping.data.datasets[0].backgroundColor.push("transparent");
+            chart_ping.data.datasets[0].borderColor.push(redBorder);
           } else if (value <= ping_green < ping_yellow) {
             // chart_ping.data.datasets[0].backgroundColor.shift();
             // chart_ping.data.datasets[0].borderColor.shift();
@@ -626,8 +673,8 @@
           previous_rtt_color = "green";
         }
 
-        saveData = navigator.connection.saveData;
-        document.getElementById("saveData").innerText = saveData;
+        // saveData = navigator.connection.saveData;
+        // document.getElementById("saveData").innerText = saveData;
 
         // UPDATE LAST UPDATE AFTER UPDATE INFORMATIONS AND BEFORE ADD DATA TO CHART
         updateLastUpdate();
