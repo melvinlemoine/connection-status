@@ -48,7 +48,7 @@
         <div class="informations__grid_information" id="rtt--box">🔂 RTT :&nbsp;<span id="rtt">waiting...</span></div>
 
         <div class="informations__grid_information" id="ping--box">
-          🔂 Ping :&nbsp;<span id="ping">Pinging...</span>
+          ↔️ Ping :&nbsp;<span id="ping">Pinging...</span>
         </div>
 
         <div class="informations__grid_information">🛡 saveData :&nbsp;<span id="saveData">waiting...</span></div>
@@ -80,12 +80,14 @@
     // You may use Promise if the browser supports ES6
     var p = new Ping();
     let pinging;
+    let ping;
 
     function launchPing() {
       pinging = setInterval(function () {
         p.ping("https://google.com")
           .then((data) => {
             console.log("Successful ping: " + data);
+            ping = data;
             document.getElementById("ping").innerText = data + "ms";
             document.getElementById("ping--box").classList.remove(previous_ping_color);
 
@@ -102,6 +104,7 @@
               document.getElementById("ping--box").classList.add("green");
               previous_ping_color = "green";
             }
+            updateTitle();
           })
           .catch((data) => {
             document.getElementById("ping").innerText = "Timeout";
@@ -501,16 +504,28 @@
           previous_rtt = rtt;
         }
 
-        document.title = "✅ " + downlink + "mb/s" + "｜" + "🔂 " + rtt + "ms";
+        updateTitle();
 
         // END OF CONNECTION STATUS ##################################################
       } else {
-        // console.log("Don't updated informations because offline");
-        document.title = "❌ Offline";
+        console.log("Don't updated informations because offline");
       }
     }
 
     // END OF UPDATE INFORMATIONS FUNCTION
+
+    // DOCUMENT TITLE UPDATE FUNCTION
+    function updateTitle() {
+      if (connection) {
+        if (!ping) {
+          ping = "Pinging...";
+        }
+        document.title = "✅ " + downlink + "mb/s" + "｜" + rtt + "ms" + "｜" + ping + "ms";
+      } else {
+        document.title = "❌ Offline";
+      }
+    }
+    // END OF DOCUMENT TITLE UPDATE FUNCTION
 
     // CHECK CONNECTION WHEN PAGE LOAD ########################################
 
