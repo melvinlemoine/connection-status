@@ -11,6 +11,29 @@
 
     <link rel="stylesheet" href="assets/css/amethyst.min.css" />
     <link rel="stylesheet" href="assets/css/styles.css" />
+
+    <!-- Matomo -->
+    <script>
+      var _paq = (window._paq = window._paq || []);
+      /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+      _paq.push(["trackPageView"]);
+      _paq.push(["enableLinkTracking"]);
+      (function () {
+        var u = "https://www.stats.melvin-lemoine.me/";
+        _paq.push(["setTrackerUrl", u + "matomo.php"]);
+        _paq.push(["setSiteId", "21"]);
+        var d = document,
+          g = d.createElement("script"),
+          s = d.getElementsByTagName("script")[0];
+        g.async = true;
+        g.src = u + "matomo.js";
+        s.parentNode.insertBefore(g, s);
+      })();
+    </script>
+    <noscript
+      ><p><img src="https://www.stats.melvin-lemoine.me/matomo.php?idsite=21&amp;rec=1" style="border: 0" alt="" /></p
+    ></noscript>
+    <!-- End Matomo Code -->
   </head>
 
   <body class="body home">
@@ -80,43 +103,57 @@
   <!-- <script src="assets/js/chartjs-plugin-datalabels.min.js"></script> -->
 
   <script>
+    const red = "rgba(255, 99, 132, 0.75)";
+    const redBorder = "rgb(255, 99, 132)";
+
+    const orange = "rgba(255, 159, 64, 0.75)";
+    const orangeBorder = "rgb(255, 159, 64)";
+
+    const yellow = "rgba(255, 205, 86, 0.75)";
+    const yellowBorder = "rgb(255, 205, 86)";
+
+    const green = "rgba(75, 192, 192, 0.75)";
+    const greenBorder = "rgb(75, 192, 192)";
+
     // You may use Promise if the browser supports ES6
     var p = new Ping();
     let pinging; // Set Interval
     let ping;
 
     function launchPing() {
+      console.log("launchPing");
       pinging = setInterval(function () {
         p.ping("https://google.com")
           .then((data) => {
-            console.log("Successful ping: " + data);
+            // console.log("Successful ping: " + data);
             ping = data;
             document.getElementById("ping").innerText = data + "ms";
             document.getElementById("ping--box").classList.remove(previous_ping_color);
 
-            if (data > ping_red) {
+            if (ping > ping_red) {
               document.getElementById("ping--box").classList.add("red");
               previous_ping_color = "red";
-            } else if (data > ping_orange) {
+            } else if (ping > ping_orange) {
               document.getElementById("ping--box").classList.add("orange");
               previous_ping_color = "orange";
-            } else if (data > ping_yellow) {
+            } else if (ping > ping_yellow) {
               document.getElementById("ping--box").classList.add("yellow");
               previous_ping_color = "yellow";
-            } else if (data < ping_green < ping_yellow) {
+            } else if (ping < ping_green < ping_yellow) {
               document.getElementById("ping--box").classList.add("green");
               previous_ping_color = "green";
             }
             updateTitle();
             // updateLastUpdate();
-            updateChart(moment().format("LTS", "h:mm:ss a"), data, "ping");
+            updateChart(moment().format("LTS", "h:mm:ss a"), ping, "ping");
           })
-          .catch((data) => {
-            document.getElementById("ping").innerText = "Timeout";
+          .catch((ping) => {
+            document.getElementById("ping").innerText = "Timeout ⚠️";
             document.getElementById("ping--box").classList.add("red");
             previous_ping_color = "red";
+            updateChart(moment().format("LTS", "h:mm:ss a"), 0, "ping");
           });
-      }, 1000);
+      }, 3000);
     }
   </script>
 
@@ -147,6 +184,25 @@
       ],
     };
 
+    // const skipped = (ctx, value) => (ctx.p0.skip || ctx.p1.skip ? value: undefined);
+    // const ping_segment_color = (ctx) => {
+    //   // console.log("value : " + chart_ping.data.datasets[0].data[ctx.datasetIndex.length - 1] + " - " + ping + " " + (chart_ping.data.datasets[0].data[ctx.datasetIndex.length - 1] == ping ? "✅" : "❌"));
+    //   // console.log("ping : " + ping);
+    //   if (ping >= ping_red) {
+    //     console.log("ping_segment_color red 🟥 " + ping);
+    //     return red;
+    //   } else if (ping >= ping_orange) {
+    //     console.log("ping_segment_color orange 🟧 " + ping);
+    //     return orange;
+    //   } else if (ping >= ping_yellow) {
+    //     console.log("ping_segment_color yellow 🟨 " + ping);
+    //     return yellow;
+    //   } else if (ping <= ping_green < ping_yellow) {
+    //     console.log("ping_segment_color green 🟩 " + ping);
+    //     return green;
+    //   }
+    // };
+
     let data_ping = {
       labels: [],
       datasets: [
@@ -156,7 +212,7 @@
           backgroundColor: [],
           borderColor: [],
           borderWidth: 1,
-          tension: .25
+          // tension: 0.25,
         },
       ],
     };
@@ -216,7 +272,7 @@
     };
 
     const config_ping = {
-      type: "line",
+      type: "bar",
       data: data_ping,
 
       options: {
@@ -244,18 +300,6 @@
     const chart_bandwidth = new Chart(document.getElementById("chart-bandwidth"), config_bandwidth);
     const chart_rtt = new Chart(document.getElementById("chart-rtt"), config_rtt);
     const chart_ping = new Chart(document.getElementById("chart-ping"), config_ping);
-
-    const red = "rgba(255, 99, 132, 0.75)";
-    const redBorder = "rgb(255, 99, 132)";
-
-    const orange = "rgba(255, 159, 64, 0.75)";
-    const orangeBorder = "rgb(255, 159, 64)";
-
-    const yellow = "rgba(255, 205, 86, 0.75)";
-    const yellowBorder = "rgb(255, 205, 86)";
-
-    const green = "rgba(75, 192, 192, 0.75)";
-    const greenBorder = "rgb(75, 192, 192)";
 
     let downlink;
     let previous_downlink;
@@ -302,19 +346,18 @@
             chart_bandwidth.data.datasets[0].data.shift();
             chart_bandwidth.data.datasets[0].backgroundColor.shift();
             chart_bandwidth.data.datasets[0].borderColor.shift();
-            console.log(
-              "Removed first element of data bandwidth array. Now : " + chart_rtt.data.datasets[0].data.length
-            );
-            console.log(
-              "Removed first element of bg bandwidth array. Now : " + chart_rtt.data.datasets[0].backgroundColor.length
-            );
-            console.log(
-              "Removed first element of border bandwidth array. Now : " + chart_rtt.data.datasets[0].borderColor.length
-            );
+            // console.log(
+            //   "Removed first element of data bandwidth array. Now : " + chart_rtt.data.datasets[0].data.length
+            // );
+            // console.log(
+            //   "Removed first element of bg bandwidth array. Now : " + chart_rtt.data.datasets[0].backgroundColor.length
+            // );
+            // console.log(
+            //   "Removed first element of border bandwidth array. Now : " + chart_rtt.data.datasets[0].borderColor.length
+            // );
           }
           chart_bandwidth.update();
           break;
-
         case "rtt":
           chart_rtt.data.labels.push(date);
           chart_rtt.data.datasets[0].data.push(rtt);
@@ -338,48 +381,48 @@
             chart_rtt.data.datasets[0].data.shift();
             chart_rtt.data.datasets[0].backgroundColor.shift();
             chart_rtt.data.datasets[0].borderColor.shift();
-            console.log("Removed first element of data rtt array. Now : " + chart_rtt.data.datasets[0].data.length);
-            console.log(
-              "Removed first element of bg rtt array. Now : " + chart_rtt.data.datasets[0].backgroundColor.length
-            );
-            console.log(
-              "Removed first element of border rtt array. Now : " + chart_rtt.data.datasets[0].borderColor.length
-            );
-          }
-          console.log("RTT DATA (" + chart_rtt.data.datasets[0].data.length + ")");
-          for (i = 0; i < chart_rtt.data.datasets[0].data.length; i++) {
-            console.log("- " + chart_rtt.data.datasets[0].data[i] + " _ " + chart_rtt.data.labels[i]);
+            //   console.log("Removed first element of data rtt array. Now : " + chart_rtt.data.datasets[0].data.length);
+            //   console.log(
+            //     "Removed first element of bg rtt array. Now : " + chart_rtt.data.datasets[0].backgroundColor.length
+            //   );
+            //   console.log(
+            //     "Removed first element of border rtt array. Now : " + chart_rtt.data.datasets[0].borderColor.length
+            //   );
+            // }
+            // console.log("RTT DATA (" + chart_rtt.data.datasets[0].data.length + ")");
+            // for (i = 0; i < chart_rtt.data.datasets[0].data.length; i++) {
+            //   console.log("- " + chart_rtt.data.datasets[0].data[i] + " _ " + chart_rtt.data.labels[i]);
           }
 
           chart_rtt.update();
           break;
         case "ping":
-          chart_ping.data.labels.push(date);
+          chart_ping.data.labels.push("");
           chart_ping.data.datasets[0].data.push(ping);
 
-          if (value >= rtt_red) {
-            chart_ping.data.datasets[0].backgroundColor.shift();
-            chart_ping.data.datasets[0].borderColor.shift();
+          if (value >= ping_red) {
+            // chart_ping.data.datasets[0].backgroundColor.shift();
+            // chart_ping.data.datasets[0].borderColor.shift();
             chart_ping.data.datasets[0].backgroundColor.push(red);
             chart_ping.data.datasets[0].borderColor.push(redBorder);
-          } else if (value >= rtt_orange) {
-            chart_ping.data.datasets[0].backgroundColor.shift();
-            chart_ping.data.datasets[0].borderColor.shift();
+          } else if (value >= ping_orange) {
+            // chart_ping.data.datasets[0].backgroundColor.shift();
+            // chart_ping.data.datasets[0].borderColor.shift();
             chart_ping.data.datasets[0].backgroundColor.push(orange);
             chart_ping.data.datasets[0].borderColor.push(orangeBorder);
-          } else if (value >= rtt_yellow) {
-            chart_ping.data.datasets[0].backgroundColor.shift();
-            chart_ping.data.datasets[0].borderColor.shift();
+          } else if (value >= ping_yellow) {
+            // chart_ping.data.datasets[0].backgroundColor.shift();
+            // chart_ping.data.datasets[0].borderColor.shift();
             chart_ping.data.datasets[0].backgroundColor.push(yellow);
             chart_ping.data.datasets[0].borderColor.push(yellowBorder);
-          } else if (value <= rtt_green < rtt_yellow) {
-            chart_ping.data.datasets[0].backgroundColor.shift();
-            chart_ping.data.datasets[0].borderColor.shift();
+          } else if (value <= ping_green < ping_yellow) {
+            // chart_ping.data.datasets[0].backgroundColor.shift();
+            // chart_ping.data.datasets[0].borderColor.shift();
             chart_ping.data.datasets[0].backgroundColor.push(green);
             chart_ping.data.datasets[0].borderColor.push(greenBorder);
           }
 
-          if (chart_ping.data.datasets[0].data.length > 20) {
+          if (chart_ping.data.datasets[0].data.length > 50) {
             setTimeout(function () {
               chart_ping.data.labels.shift();
               chart_ping.data.datasets[0].data.shift();
@@ -387,18 +430,18 @@
               chart_ping.data.datasets[0].borderColor.shift();
             }, 100);
 
-            console.log("Removed first element of data ping array. Now : " + chart_ping.data.datasets[0].data.length);
-            console.log(
-              "Removed first element of bg ping array. Now : " + chart_ping.data.datasets[0].backgroundColor.length
-            );
-            console.log(
-              "Removed first element of border ping array. Now : " + chart_ping.data.datasets[0].borderColor.length
-            );
+            //   console.log("Removed first element of data ping array. Now : " + chart_ping.data.datasets[0].data.length);
+            //   console.log(
+            //     "Removed first element of bg ping array. Now : " + chart_ping.data.datasets[0].backgroundColor.length
+            //   );
+            //   console.log(
+            //     "Removed first element of border ping array. Now : " + chart_ping.data.datasets[0].borderColor.length
+            //   );
           }
-          console.log("PING DATA (" + chart_ping.data.datasets[0].data.length + ")");
-          for (i = 0; i < chart_ping.data.datasets[0].data.length; i++) {
-            console.log("- " + chart_ping.data.datasets[0].data[i] + " _ " + chart_ping.data.labels[i]);
-          }
+          // console.log("PING DATA (" + chart_ping.data.datasets[0].data.length + ")");
+          // for (i = 0; i < chart_ping.data.datasets[0].data.length; i++) {
+          //   console.log("- " + chart_ping.data.datasets[0].data[i] + " _ " + chart_ping.data.labels[i]);
+          // }
 
           chart_ping.update();
           break;
@@ -669,7 +712,7 @@
       document.getElementById("rtt--box").classList.add("not-supported");
       document.getElementById("rtt--box").classList.remove(previous_rtt_color);
       // PING DISABLE
-      document.getElementById("ping").innerText = 0 + "mb/s";
+      document.getElementById("ping").innerText = 0 + "ms";
       document.getElementById("ping--box").classList.add("not-supported");
       document.getElementById("ping--box").classList.remove(previous_ping_color);
       // EFFECTIVE TYPE DISABLE
