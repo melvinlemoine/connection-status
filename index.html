@@ -110,13 +110,13 @@
   </body>
 
   <script src="assets/js/moment.min.js"></script>
-  <!-- <script src="assets/js/moment_fr.min.js"></script> -->
-  <!-- <script>
-  moment.locale("fr");
-</script> -->
   <script src="assets/js/chart.min.js"></script>
   <script src="assets/js/ping.min.js"></script>
-  <!-- <script src="assets/js/chartjs-plugin-datalabels.min.js"></script> -->
+
+  <script src="js/variables.js"></script>
+  <script src="js/interface.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/charts.js"></script>
 
   <script>
     const red = "rgba(255, 99, 132, 0.75)";
@@ -133,60 +133,6 @@
 
     const grey = "rgba(201, 203, 207, 0.75)";
     const greyBorder = "rgba(201, 203, 207)";
-
-    // You may use Promise if the browser supports ES6
-    var p = new Ping();
-    // let pinging; // Set Interval
-    let ping;
-
-    function launchPing() {
-      // console.log("launchPing");
-      p.ping("https://google.com")
-        .then((data) => {
-          // console.log("Successful ping: " + data);
-          ping = data;
-          document.getElementById("ping").innerText = data + "ms";
-          document.getElementById("ping--box").classList.remove(previous_ping_color);
-
-          if (ping > ping_red) {
-            document.getElementById("ping--box").classList.add("red");
-            previous_ping_color = "red";
-          } else if (ping > ping_orange) {
-            document.getElementById("ping--box").classList.add("orange");
-            previous_ping_color = "orange";
-          } else if (ping > ping_yellow) {
-            document.getElementById("ping--box").classList.add("yellow");
-            previous_ping_color = "yellow";
-          } else if (ping < ping_green < ping_yellow) {
-            document.getElementById("ping--box").classList.add("green");
-            previous_ping_color = "green";
-          }
-          // setTimeout(function () {
-          //   launchPing();
-          //   console.log("launchPing from success");
-          // }, 3000);
-
-          updateTitle();
-          // updateLastUpdate();
-          updateChart(moment().format("LTS", "h:mm:ss a"), ping, "ping");
-        })
-        .catch((ping) => {
-          document.getElementById("ping").innerText = "Timeout ⚠️";
-          document.getElementById("ping--box").classList.add("red");
-          previous_ping_color = "red";
-          updateChart(moment().format("LTS", "h:mm:ss a"), "timeout", "ping");
-          // setTimeout(function () {
-          //   launchPing();
-          //   console.log("launchPing from error");
-          // }, 3000);
-        })
-        .then((ping) => {
-          setTimeout(function () {
-            launchPing();
-            console.log("launchPing from last then");
-          }, 3000);
-        });
-    }
   </script>
 
   <script>
@@ -194,7 +140,7 @@
       labels: [],
       datasets: [
         {
-          label: "Connection speed in mb/s",
+          label: "Connection speed in Mb/s",
           data: [],
           backgroundColor: [],
           borderColor: [],
@@ -272,7 +218,7 @@
           },
           title: {
             display: true,
-            text: "Connexion speed in mb/s",
+            text: "Connexion speed in Mb/s",
           },
         },
       },
@@ -333,21 +279,6 @@
     const chart_bandwidth = new Chart(document.getElementById("chart-bandwidth"), config_bandwidth);
     const chart_rtt = new Chart(document.getElementById("chart-rtt"), config_rtt);
     const chart_ping = new Chart(document.getElementById("chart-ping"), config_ping);
-
-    let downlink;
-    let previous_downlink;
-
-    let rtt;
-    let previous_rtt;
-
-    let downlinkmax;
-    let previous_downlinkmax;
-
-    let type;
-    let previous_type;
-
-    let effectiveType;
-    let previous_effectiveType;
 
     // let saveData;
     // let previous_saveData;
@@ -497,79 +428,10 @@
   </script>
 
   <script>
-    let connection = false;
-
-    // LAST UPDATE FUNCTION################################################################################
-
-    let lastUpdateDate;
-    let updating;
-
-    function updateLastUpdate() {
-      console.log("🔄 LastUpdate updated");
-      if (updating) {
-        clearInterval(updating);
-      }
-
-      // SET RELATIVE DATE ON LAST UPDATE
-      lastUpdateDate = moment().format("LTS");
-      document.getElementById("lastUpdate").innerText = moment(lastUpdateDate, "h:mm:ss a").fromNow();
-
-      // UPDATE MOMENT RELATIVE DATE
-      updating = setInterval(function () {
-        document.getElementById("lastUpdate").innerText = moment(lastUpdateDate, "h:mm:ss a").fromNow();
-      }, 5000);
-    }
-
-    // END OF LAST UPDATE FUNCTION ######################################################################
-
-    // GET IP ##################################################
-
-    function getIP() {
-      document.getElementById("ip").innerText = "Reaching IP...";
-      fetch("https://api.ipify.org/")
-        .then((r) => r.text())
-        .then((r) => {
-          const IP = r;
-          document.getElementById("ip").innerText = IP;
-        })
-        .catch((error) => {
-          setTimeout(function () {
-            getIP();
-          }, 2000);
-          document.getElementById("ip").innerText = "Can't get IP (ads/tracker blocker or timeout)";
-        });
-    }
-
-    if (connection) {
-      getIP();
-    }
 
     // END OF GET IP ##################################################
 
     // UPDATE INFORMATIONS FUNCTION ##################################################
-
-    let previous_effectiveType_color;
-    let previous_rtt_color;
-    let previous_downlink_color;
-    let previous_ping_color;
-
-    // RTT COLORS
-    let rtt_green = 500;
-    let rtt_yellow = 1000;
-    let rtt_orange = 2000;
-    let rtt_red = 3000;
-
-    // DOWNLINK COLORS
-    let downlink_green = 2.5;
-    let downlink_yellow = 2;
-    let downlink_orange = 1;
-    let downlink_red = 0;
-
-    // PING COLORS
-    let ping_green = 150;
-    let ping_yellow = 250;
-    let ping_orange = 500;
-    let ping_red = 1000;
 
     function updateInformations() {
       console.log("🔄 Informations Updated");
@@ -623,7 +485,7 @@
 
         downlinkMax = navigator.connection.downlinkMax;
         if (downlinkMax) {
-          document.getElementById("downlinkMax").innerText = downlinkMax + "mb/s";
+          document.getElementById("downlinkMax").innerText = downlinkMax + " Mb/s";
           document.getElementById("downlinkMax--box").classList.remove("not-supported");
         } else {
           document.getElementById("downlinkMax").innerText = "Not supported";
@@ -633,9 +495,9 @@
         downlink = navigator.connection.downlink;
 
         if (downlink >= 10) {
-          document.getElementById("downlink").innerText = "+" + downlink + "mb/s";
+          document.getElementById("downlink").innerText = "+" + downlink + " Mb/s";
         } else {
-          document.getElementById("downlink").innerText = downlink + "mb/s";
+          document.getElementById("downlink").innerText = downlink + " Mb/s";
         }
 
         document.getElementById("downlink--box").classList.remove(previous_downlink_color);
@@ -699,82 +561,7 @@
 
     // END OF UPDATE INFORMATIONS FUNCTION
 
-    // DOCUMENT TITLE UPDATE FUNCTION
-    function updateTitle() {
-      if (connection) {
-        if (!ping) {
-          ping = "Pinging...";
-        }
-        document.title = "✅ " + downlink + "mb/s" + "｜" + rtt + "ms" + "｜" + ping + "ms";
-      } else {
-        document.title = "❌ Offline";
-      }
-    }
     // END OF DOCUMENT TITLE UPDATE FUNCTION
-
-    // CHECK CONNECTION WHEN PAGE LOAD ########################################
-
-    if (navigator.onLine === true) {
-      goOnline();
-    } else {
-      goOffline();
-    }
-
-    function goOnline() {
-      document.getElementById("status").innerText = "✅ Online";
-      document.getElementById("status").classList.remove("offline");
-      document.getElementById("status").classList.add("online");
-      connection = true;
-      console.log("✅ Connection restored");
-      updateLastUpdate();
-      getIP();
-      launchPing();
-
-      // DOWNLINK ENABLE
-      document.getElementById("downlink--box").classList.remove("not-supported");
-      // RTT ENABLE
-      document.getElementById("rtt--box").classList.remove("not-supported");
-      // PING ENABLE
-      document.getElementById("ping--box").classList.remove("not-supported");
-      // EFFECTIVE TYPE ENABLE
-      document.getElementById("effectiveType--box").classList.remove("not-supported");
-    }
-
-    function goOffline() {
-      document.getElementById("status").innerText = "❌ Offline";
-      document.getElementById("status").classList.remove("online");
-      document.getElementById("status").classList.add("offline");
-      connection = false;
-      console.log("❌ Connection lost");
-      document.getElementById("ip").innerText = "no IP";
-      updateLastUpdate();
-      clearInterval(pinging);
-
-      // DOWNLINK DISABLE
-      document.getElementById("downlink").innerText = 0 + "mb/s";
-      document.getElementById("downlink--box").classList.add("not-supported");
-      document.getElementById("downlink--box").classList.remove(previous_downlink_color);
-      // RTT DISABLE
-      document.getElementById("rtt").innerText = 0 + "mb/s";
-      document.getElementById("rtt--box").classList.add("not-supported");
-      document.getElementById("rtt--box").classList.remove(previous_rtt_color);
-      // PING DISABLE
-      document.getElementById("ping").innerText = 0 + "ms";
-      document.getElementById("ping--box").classList.add("not-supported");
-      document.getElementById("ping--box").classList.remove(previous_ping_color);
-      // EFFECTIVE TYPE DISABLE
-      document.getElementById("effectiveType").innerText = "Not supported";
-      document.getElementById("effectiveType--box").classList.add("not-supported");
-      document.getElementById("effectiveType--box").classList.remove(previous_effectiveType_color);
-    }
-
-    window.addEventListener("online", function () {
-      goOnline();
-    });
-
-    window.addEventListener("offline", function () {
-      goOffline();
-    });
 
     // END OF CHECK CONNECTION WHEN PAGE LOAD ########################################
 
